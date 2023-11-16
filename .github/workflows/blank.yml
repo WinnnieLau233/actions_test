@@ -23,28 +23,27 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Switch to the workspace (root directory) of the warehouse
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
       # Configure Git user
       - name: Configure Git
         env:
-          GIT_USERNAME:${{ secrets.NAME }}
-          GIT_EMAIL:${{ secrets.EMAIL }}
-          run:|
+          GIT_USERNAME: ${{ secrets.NAME }}
+          GIT_EMAIL: ${{ secrets.EMAIL }}
+        run: |
           git config --global user.name "${GIT_USERNAME}"
           git config --global user.email "${GIT_EMAIL}"
-          
+
       # Check if an updated version is required
       - name: Check if version update is needed
         id: version-check
         run: |
-          # Get recent commit information
           latest_commit_message=$(git log --pretty=format:%s -1)
-
           if [[ $latest_commit_message == *"[]" ]]; then
             echo "Skip version update as it was triggered by an automated commit" 
-            exit 78
+            echo "::set-output name=skip::true"
           else 
             echo "Version update is needed"
           fi
